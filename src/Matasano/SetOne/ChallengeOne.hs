@@ -1,4 +1,4 @@
-module Matasano.SetOne.ChallengeOne (hexTo64, test) where
+module Matasano.SetOne.ChallengeOne (hexTo64, readHex, show64, test) where
 
 import Data.Bits ((.&.), (.|.), shift)
 import Data.Char (digitToInt)
