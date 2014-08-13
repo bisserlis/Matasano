@@ -4,6 +4,7 @@ import qualified Matasano.SetOne.ChallengeOne as ChallengeOne
 import qualified Matasano.SetOne.ChallengeTwo as ChallengeTwo
 import qualified Matasano.SetOne.ChallengeThree as ChallengeThree
 import qualified Matasano.SetOne.ChallengeFour as ChallengeFour
+import qualified Matasano.SetOne.ChallengeFive as ChallengeFive
 
 test :: IO ()
 test = do
@@ -15,3 +16,4 @@ test = do
         ChallengeTwo.test
         ChallengeThree.test
         ChallengeFour.test
+        ChallengeFive.test
