@@ -67,4 +67,4 @@ test = do
         putStrLn "Best Guess: "
         putStrLn ("  Original: " ++ original)
         putStrLn ("  Key     : " ++ show key)
-        putStrLn ("  Result  : " ++ result)
+        putStrLn ("  Result  : " ++ show result)
