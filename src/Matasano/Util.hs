@@ -4,16 +4,15 @@ module Matasano.Util ( readHex, showHex
 
 import Data.Bits ((.&.), (.|.), shift)
 import Data.Char (digitToInt, intToDigit)
-import Data.List (foldl', unfoldr)
 import Data.Map (Map, findWithDefault, fromList)
 import Data.Word (Word8)
 
 readHex :: String -> [Word8]
-readHex = reverse . unfoldr readHex' . reverse
+readHex [] = []
+readHex (_:[]) = error "readHex: String must be of even length"
+readHex (h:l:cs) = readByte h l : readHex cs
     where
-        readHex'      []  = Nothing
-        readHex' (l:  []) = Just ((low l), [])
-        readHex' (l:h:ds) = Just ((high h .|. low l), ds)
+        readByte h' l' = high h' .|. low l'
         
         low = fromIntegral . digitToInt
         high = (`shift` 4) . low
@@ -32,6 +31,9 @@ read64 :: String -> [Word8]
 read64 = go
     where
         go                  []  = []
+        go (            _ : []) = error "read64: Malformed base64 string"
+        go (        _ : _ : []) = error "read64: Malformed base64 string"
+        go (    _ : _ : _ : []) = error "read64: Malformed base64 string"
         go (a : b :'=':'=': []) = tri1 (val a) (val b)
                                 : []
         go (a : b : c :'=': []) = tri1 (val a) (val b)
@@ -51,7 +53,6 @@ read64 = go
         
         val :: Char -> Word8
         val c = findWithDefault err c table
-        
         err = error "read64: Invalid base64 character"
         
         table :: Map Char Word8
@@ -59,18 +60,20 @@ read64 = go
                               [0..63])
 
 show64 :: [Word8] -> String
-show64        []  = []
-show64 (a:    []) = enc1 a : enc2 a 0 : "=="
-show64 (a:b:  []) = enc1 a : enc2 a b : enc3 b 0 : "="
-show64 (a:b:c:ds) = enc1 a : enc2 a b : enc3 b c : enc4 c : show64 ds
+show64 = show64'
+    where
+        show64'        []  = []
+        show64' (a:    []) = enc1 a : enc2 a 0 : "=="
+        show64' (a:b:  []) = enc1 a : enc2 a b : enc3 b 0 : "="
+        show64' (a:b:c:ds) = enc1 a : enc2 a b : enc3 b c : enc4 c : show64' ds
+        
+        enc1 x     = encode $ (x .&. (128+64+32+16+8+4    )) `shift` (-2)
+        enc2 x y   = encode $ (x .&. (                 2+1)) `shift`   4
+                          .|. (y .&. (128+64+32+16        )) `shift` (-4)
+        enc3   y z = encode $ (y .&. (             8+4+2+1)) `shift`   2
+                          .|. (z .&. (128+64              )) `shift` (-6)
+        enc4     z = encode $ (z .&. (       32+16+8+4+2+1))
+        
+        encode e = (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "+/")
+                !! fromIntegral e
 
-enc1 x     = encode $ shift (mask x [1,1,1,1,1,1,0,0]) (-2)
-enc2 x y   = encode $ shift (mask x [0,0,0,0,0,0,1,1])   4
-                  .|. shift (mask y [1,1,1,1,0,0,0,0]) (-4)
-enc3   y z = encode $ shift (mask y [0,0,0,0,1,1,1,1])   2
-                  .|. shift (mask z [1,1,0,0,0,0,0,0]) (-6)
-enc4     z = encode $        mask z [0,0,1,1,1,1,1,1]
-
-mask i m = i .&. foldl' (\acc b -> shift acc 1 .|. b) 0 m
-
-encode e = (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "+/") !! fromIntegral e
