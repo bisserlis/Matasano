@@ -6,7 +6,7 @@ import Data.Function (on)
 import Data.List (maximumBy)
 import Data.Word (Word8)
 
-import Matasano.SetOne.ChallengeOne (readHex)
+import Matasano.Util (readHex)
 
 crypt :: Word8 -> [Word8] -> [Word8]
 crypt k s = zipWith xor s (repeat k)

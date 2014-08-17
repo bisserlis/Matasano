@@ -4,38 +4,10 @@ import Data.Bits ((.&.), (.|.), popCount, shift, xor)
 import Data.Char (chr)
 import Data.Function (on)
 import Data.List (maximumBy, minimumBy, tails, transpose)
-import Data.Map (Map, findWithDefault, fromList, fromListWith)
+import Data.Map (Map, findWithDefault, fromListWith)
 import Data.Word (Word8)
 
-read64 :: String -> [Word8]
-read64 = go
-    where
-        go                  []  = []
-        go (a : b :'=':'=': []) = tri1 (val a) (val b)
-                                : []
-        go (a : b : c :'=': []) = tri1 (val a) (val b)
-                                : tri2 (val b) (val c)
-                                : []
-        go (a : b : c : d : es) = tri1 (val a) (val b)
-                                : tri2 (val b) (val c)
-                                : tri3 (val c) (val d)
-                                : go es
-        
-        tri1 h l = shift  h                                  2
-               .|. shift (l .&. (32 + 16                )) (-4)
-        tri2 h l = shift (h .&. (          8 + 4 + 2 + 1))   4
-               .|. shift (l .&. (32 + 16 + 8 + 4        )) (-2)
-        tri3 h l = shift (h .&. (                  2 + 1))   6
-               .|.        l
-        
-        val :: Char -> Word8
-        val c = findWithDefault err c table
-        
-        err = error "read64: Invalid base64 character"
-        
-        table :: Map Char Word8
-        table = fromList (zip (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "+/")
-                              [0..63])
+import Matasano.Util (read64)
 
 hamming :: [Word8] -> [Word8] -> Int
 hamming a b = sum . map popCount $ zipWith xor a b

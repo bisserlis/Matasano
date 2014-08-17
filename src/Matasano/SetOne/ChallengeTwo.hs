@@ -1,22 +1,11 @@
-module Matasano.SetOne.ChallengeTwo (showHex, xorHex, test) where
+module Matasano.SetOne.ChallengeTwo (test) where
 
-import Data.Bits ((.&.), shift, xor)
-import Data.Char (intToDigit)
-import Matasano.SetOne.ChallengeOne (readHex)
-import Data.Word (Word8)
+import Data.Bits (xor)
+
+import Matasano.Util (readHex, showHex)
 
 xorHex :: String -> String -> String
 xorHex s t = showHex (zipWith xor (readHex s) (readHex t))
-
-showHex :: [Word8] -> String
-showHex = concatMap hexPair
-    where
-        hexPair n = [showDigit (high n), showDigit (low n)]
-        
-        high n = (n .&. (128 + 64 + 32 + 16                )) `shift` (-4)
-        low n  =  n .&. (                     8 + 4 + 2 + 1)
-        
-        showDigit = intToDigit . fromIntegral
 
 xorHex_test :: Bool
 xorHex_test = xorHex a b == c

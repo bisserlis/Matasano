@@ -4,7 +4,7 @@ import Data.Bits (xor)
 import Data.Char (ord)
 import Data.Word (Word8)
 
-import Matasano.SetOne.ChallengeTwo (showHex)
+import Matasano.Util (showHex)
 
 type Key = [Word8]
 type Bytes = [Word8]

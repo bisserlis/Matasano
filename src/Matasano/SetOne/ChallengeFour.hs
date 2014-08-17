@@ -7,7 +7,7 @@ import Data.List (maximumBy)
 import Data.Map.Strict (Map, fromList, findWithDefault)
 import Data.Word (Word8)
 
-import Matasano.SetOne.ChallengeOne (readHex)
+import Matasano.Util (readHex)
 
 -- Shamelessly lifted off en.wikipedia.org/wiki/Letter_frequency
 frequencies :: Map Char Double
